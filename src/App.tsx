@@ -6,8 +6,7 @@ import words from './wordList.json';
 import { Fireworks } from '@fireworks-js/react'
 
 function App() {
-  const randomWord = words[Math.floor(Math.random() * words.length)]
-  const [wordToGuess, setWorldToGuess] = useState("test");
+  const [wordToGuess, setWordToGuess] = useState(() => words[Math.floor(Math.random() * words.length)]);
   const [guessedLetters, setGuessedLetters] = useState<string[]>([])
 
   const incorrectLetters = guessedLetters.filter(letter => !wordToGuess.includes(letter))
@@ -19,7 +18,7 @@ function App() {
     if(guessedLetters.includes(letter) || isLoser || isWinner) return
 
     setGuessedLetters(currentLetters => [...currentLetters, letter])
-  }, [guessedLetters])
+  }, [guessedLetters, isLoser, isWinner])
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) =>  {
@@ -36,7 +35,7 @@ function App() {
     return () => {
       document.removeEventListener("keypress", handler);
     }
-  }, [guessedLetters])
+  }, [addGuessedLetter])
 
  return (
   <>
@@ -54,7 +53,8 @@ function App() {
           width: '100%',
           height: '100%',
           position: 'fixed',
-          background: '#000'
+          background: '#000',
+          pointerEvents: 'none'
         }}
       />
     }
@@ -67,9 +67,11 @@ function App() {
     alignItems: "center",
   }}>
     <div style={{ fontSize: "2rem", textAlign: "center", color: 'white'}}>
-        {isWinner && "Winner! - Refresh to try again"}
-        {isLoser && "Nice try! - Refresh to try again"}
+        {isWinner && "Winner!"}
+        {isLoser && "Nice try!"}
     </div>
+    <h1 style={{color:'white',fontSize:'1.5rem'}}>Word Guess · React + TypeScript</h1>
+    <button type="button" style={{padding:'10px 18px',position:'relative',zIndex:1}} onClick={() => { setWordToGuess(words[Math.floor(Math.random() * words.length)]); setGuessedLetters([]); }}>New game</button>
     <HangmanDrawing numberOfGuesses={incorrectLetters.length}/>
     <HangmanWord reveal={isLoser} guessedLetters={guessedLetters} wordToGuess={wordToGuess}/>
     <div style={{ alignSelf: "stretch" }}>
